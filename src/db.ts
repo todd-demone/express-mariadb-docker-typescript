@@ -1,10 +1,8 @@
-// import mysql from 'mysql2/promise';
-import mysql, { ConnectionOptions, RowDataPacket } from 'mysql2';
+import mysql, { Connection, ConnectionOptions } from 'mysql2/promise';
 import dotenv from 'dotenv';
 
 // Load environment variables from .env file
 dotenv.config();
-
 
 const access: ConnectionOptions = {
   host: process.env.DB_HOST,
@@ -13,14 +11,6 @@ const access: ConnectionOptions = {
   database: process.env.DB_NAME,
 };
 
-const conn = mysql.createConnection(access);
-console.log("SUCCESS!!!!!!");
-// SELECT
-conn.query<RowDataPacket[]>('SELECT * FROM `user`;', (_err, rows) => {
-    console.log(rows);
-    /**
-     * @rows: [ { test: 2 } ]
-     */
-  });
+const conn = await mysql.createConnection(access);
 
 export default conn;
