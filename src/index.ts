@@ -9,8 +9,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/', async (req: Request, res: Response) => {
-    const [rows, fields] = await conn.query<RowDataPacket[]>('SELECT * FROM `user`');
-    res.send(`Hello, ${rows[0].name}. Welcome to Express-mariadb-docker-typescript!`);
+    try {
+        const [rows] = await conn.query<RowDataPacket[]>('SELECT * FROM `user`');
+        res.send(`Hello, ${rows[0].name}. Welcome to Express-mariadb-docker-typescript!`);
+    } catch (err) {
+        console.log("ERROR: ", err);
+    }
   });
 
 app.listen(PORT, () => {
