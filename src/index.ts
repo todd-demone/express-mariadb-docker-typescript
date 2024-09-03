@@ -1,12 +1,15 @@
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
+import morgan from 'morgan';
 import { RowDataPacket } from 'mysql2/promise';
 import conn from './db';
 
 dotenv.config();
 
-const app = express();
+const app = express(); 
 const PORT = process.env.PORT || 3000;
+
+app.use(morgan("combined"));
 
 app.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
