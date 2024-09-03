@@ -11,6 +11,6 @@ const access: ConnectionOptions = {
   database: process.env.DB_NAME,
 };
 
-const conn = await mysql.createConnection(access);
+const conn: Connection = await mysql.createConnection(access);
 
 export default conn;
