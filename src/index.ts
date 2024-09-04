@@ -29,12 +29,19 @@ app.get("/", async (_req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-if (env === "production") {
+const errorHandler = function (
+  err: Error,
+  _req: Request,
+  res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err);
-    res.status(500).send("Error: Internal Server Error");
-  });
+  _next: NextFunction
+) {
+  console.error(err);
+  res.status(500).send("Error: Internal Server Error");
+};
+
+if (env === "production") {
+  app.use(errorHandler);
 }
 
 app.listen(PORT, () => {
