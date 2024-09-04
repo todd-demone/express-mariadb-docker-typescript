@@ -10,23 +10,25 @@ const PORT = process.env.PORT ?? 3000;
 
 const app = express();
 
-const env = process.env.NODE_ENV ?? "production";
-app.set("env", env);
+app.set(
+  "env",
+  process.env.NODE_ENV === "production" ? "production" : "development"
+);
 
-const db = pool;
-app.set("db", db);
+app.set("db", pool);
 
 app.use(morgan("combined"));
 
-const getAllUsers = async function (db: Pool): Promise<RowDataPacket[]> {
+const getAllUsers = async function (req: Request): Promise<RowDataPacket[]> {
   const sqlQuery = "SELECT * FROM `user`";
+  const db = req.app.get("db") as Pool;
   const [rows] = await db.query<RowDataPacket[]>(sqlQuery);
   return rows;
 };
 
 // Wrapping the async database query function in a regular function. Goal: avoid returning a Promise from our app.get() callback function; Instead we return void, which is what app.get() expects.
-app.get("/", (_req: Request, res: Response, next: NextFunction) => {
-  getAllUsers(db)
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+  getAllUsers(req)
     .then((r: RowDataPacket[]) =>
       res.send(`Welcome, ${r[0].name}, to Express-TypeScript-MariaDB-Docker!`)
     )
@@ -34,7 +36,7 @@ app.get("/", (_req: Request, res: Response, next: NextFunction) => {
 });
 
 const errorHandler = function (
-  err: Error,
+  _err: Error,
   _req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,7 +45,7 @@ const errorHandler = function (
   res.status(500).send("Error: Internal Server Error");
 };
 
-if (env === "production") {
+if (app.get("env") === "production") {
   app.use(errorHandler);
 }
 
