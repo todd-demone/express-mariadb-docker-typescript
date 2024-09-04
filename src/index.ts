@@ -6,31 +6,31 @@ import { Pool, RowDataPacket } from "mysql2/promise";
 import pool from "./db";
 
 dotenv.config();
+const PORT = process.env.PORT ?? 3000;
+
 const app = express();
 
 const env = process.env.NODE_ENV ?? "production";
-
 app.set("env", env);
 
-const PORT = process.env.PORT ?? 3000;
+const db = pool;
+app.set("db", db);
 
 app.use(morgan("combined"));
 
-const getAllUsers = async function (pool: Pool): Promise<RowDataPacket[]> {
+const getAllUsers = async function (db: Pool): Promise<RowDataPacket[]> {
   const sqlQuery = "SELECT * FROM `user`";
-  const [rows] = await pool.query<RowDataPacket[]>(sqlQuery);
+  const [rows] = await db.query<RowDataPacket[]>(sqlQuery);
   return rows;
 };
 
-// Wrapping the async database query function in a regular function
-// Goal: avoid returning a Promise from our app.get() callback function;
-// instead we return void, which is what app.get() expects.
+// Wrapping the async database query function in a regular function. Goal: avoid returning a Promise from our app.get() callback function; Instead we return void, which is what app.get() expects.
 app.get("/", (_req: Request, res: Response, next: NextFunction) => {
-  getAllUsers(pool)
+  getAllUsers(db)
     .then((r: RowDataPacket[]) =>
       res.send(`Welcome, ${r[0].name}, to Express-TypeScript-MariaDB-Docker!`)
     )
-    .catch(next); // catch any unhandled rejections
+    .catch(next); // send rejection to the error handling middleware
 });
 
 const errorHandler = function (
