@@ -16,17 +16,25 @@ const PORT = process.env.PORT ?? 3000;
 
 app.use(morgan("combined"));
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-app.get("/", async (_req: Request, res: Response, next: NextFunction) => {
+const asyncGetAllUsers = async function (req: Request, res: Response) {
+  // removed try-catch here to avoid redundancy (two places - here and error middleware);
+  // instead of dealing with errors here, I delegated
+  // error handling to the wrapper callback function in app.get()
+  // (using async/await's `.catch` method - i.e., `.catch(next)`)
+  // and my errorHandler middleware
   const sqlQuery = "SELECT * FROM `user`";
-  try {
-    const [rows] = await pool.query<RowDataPacket[]>(sqlQuery);
-    res.send(
-      `Hello, ${rows[0].name}. Welcome to Express-mariadb-docker-typescript!`
-    );
-  } catch (err) {
-    next(err);
-  }
+  const [rows] = await pool.query<RowDataPacket[]>(sqlQuery);
+  res.send(
+    `Hello, ${rows[0].name}. Welcome to Express-mariadb-docker-typescript!`
+  );
+};
+
+// Wrapping the async handler in a regular function
+// Goal: avoid returning a Promise from our async/await function;
+// instead we return void, which is what app.get() expects.
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+  // If there are any unhandled promise rejections after calling this async function, they are caught and passed to next().
+  asyncGetAllUsers(req, res).catch(next); // catch any unhandled rejections
 });
 
 const errorHandler = function (
