@@ -1,6 +1,8 @@
 # Express-MariaDB-TypeScript-Docker
 
-## Prerequisites:
+A starter template for making Express-TypeScript-MariaDB-Docker apps
+
+## Prerequisites
 
 1. Install Docker on your machine.
 
