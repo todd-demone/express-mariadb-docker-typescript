@@ -1,5 +1,5 @@
-import mysql, { PoolOptions } from 'mysql2/promise';
-import dotenv from 'dotenv';
+import mysql, { PoolOptions } from "mysql2/promise";
+import dotenv from "dotenv";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -11,6 +11,6 @@ const access: PoolOptions = {
   database: process.env.DB_NAME,
 };
 
-const conn = mysql.createPool(access);
+const pool = mysql.createPool(access);
 
-export default conn;
+export default pool;

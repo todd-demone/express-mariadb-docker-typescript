@@ -3,7 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import { RowDataPacket } from "mysql2/promise";
-import conn from "./db";
+import pool from "./db";
 
 dotenv.config();
 const app = express();
@@ -20,7 +20,7 @@ app.use(morgan("combined"));
 app.get("/", async (_req: Request, res: Response, next: NextFunction) => {
   const sqlQuery = "SELECT * FROM `user`";
   try {
-    const [rows] = await conn.query<RowDataPacket[]>(sqlQuery);
+    const [rows] = await pool.query<RowDataPacket[]>(sqlQuery);
     res.send(
       `Hello, ${rows[0].name}. Welcome to Express-mariadb-docker-typescript!`
     );
